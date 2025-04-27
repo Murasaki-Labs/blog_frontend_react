@@ -18,7 +18,7 @@ const ArticlesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-6xl">
+    <div className="container mx-auto px-4 pt-10 max-w-6xl">
       <ArticlePreviewGrid articles={articles} />
     </div>
   );
