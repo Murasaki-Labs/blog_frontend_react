@@ -5,6 +5,11 @@ export interface FrontMatter {
   date: string;
   description: string;
   previewImage?: string | null;
+  authorImage?: string | null;
+  author?: string | null;
+  authorHandle?: string | null;
+  readTime?: string | null;
+  tag?: string | null;
 }
 
 export interface ParsedArticle {
