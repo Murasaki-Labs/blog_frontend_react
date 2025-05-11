@@ -1,18 +1,35 @@
 import { useEffect, useState } from 'react';
-import { Article } from '../types/article';
+import { ArticleMetadata } from '../types/article';
 import { fetchArticles } from '../services/article.service';
 
 export function useArticles() {
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<ArticleMetadata[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetchArticles()
-      .then(setArticles)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    const abortController = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchArticles();
+        setArticles(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load articles');
+      } finally {
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return { articles, loading, error };

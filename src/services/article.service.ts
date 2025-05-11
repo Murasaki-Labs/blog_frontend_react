@@ -1,22 +1,28 @@
 import axios from 'axios';
-import { Article } from '../types/article';
+import { ArticleMetadata, ArticleWithContent } from '../types/article';
 
 const API_URL = '/api';
 
-export const fetchArticles = async (): Promise<Article[]> => {
+export const fetchArticles = async (): Promise<ArticleMetadata[]> => {
   try {
-    const { data } = await axios.get<Article[]>(`${API_URL}/articles`);
+    const { data } = await axios.get<ArticleMetadata[]>(`${API_URL}/articles`);
     return data;
   } catch {
     throw new Error('Error when downloading articles');
   }
 };
 
-export const fetchArticleBySlug = async (slug: string): Promise<string> => {
+export const fetchArticleBySlug = async (slug: string): Promise<ArticleWithContent> => {
   try {
-    const { data } = await axios.get<string>(`${API_URL}/articles/${slug}`);
-    return data;
+    const metadataResponse = await axios.get<ArticleMetadata>(`${API_URL}/articles/${slug}`);
+    const contentResponse = await axios.get(`${API_URL}/articles/${slug}.html`, {
+      responseType: 'text',
+    });
+    return {
+      metadata: metadataResponse.data,
+      content: contentResponse.data,
+    };
   } catch {
-    throw new Error('Error when downloading an article');
+    throw new Error('Error when downloading article');
   }
 };

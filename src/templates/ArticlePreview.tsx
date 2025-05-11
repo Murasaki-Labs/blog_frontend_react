@@ -1,11 +1,14 @@
 import React from 'react';
-import { Article } from '../types/article';
+import { ArticleMetadata } from '../types/article';
 import { Skeleton } from '../components/Skeleton';
 import { NavLink } from 'react-router';
 import { Lightbulb } from 'lucide-react';
+import { getActiveBulbs } from '../utils/getActiveBulbs';
+import { formatDate } from '../utils/formatDate';
+import { ArticleTags } from '../components/ArticleTags';
 
 interface ArticlePreviewProps {
-  article: Article;
+  article: ArticleMetadata;
   loading?: boolean;
 }
 
@@ -24,6 +27,8 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({ article, loading
     );
   }
 
+  const activeBulbs = getActiveBulbs(article.difficulty.toLowerCase());
+
   return (
     <NavLink
       to={`/articles/${article.slug}`}
@@ -33,7 +38,7 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({ article, loading
         className="rounded-t-3xl w-full h-48 object-cover"
         alt={article.title}
         loading="lazy"
-        src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+        src={article.coverImage}
       />
       <div className="p-6 pb-7 flex-1 flex flex-col">
         <h2 className="text-2xl font-extrabold mb-4 leading-tight text-[var(--color-primary)] dark:text-[var(--color-primary)] font-title">
@@ -44,44 +49,38 @@ export const ArticlePreview: React.FC<ArticlePreviewProps> = ({ article, loading
         </p>
         <div className="mt-10 grid grid-cols-2">
           <div className="flex items-center flex-wrap mb-6 col-span-2">
-            <div className="flex-1 flex items-center">
-              <div className="flex items-center px-2 py-1 border-2 rounded-lg border-gray-100 dark:border-[var(--color-tag-border)] text-slate-600 dark:text-[var(--color-muted-foreground)] mr-2">
-                <img
-                  className="w-6 h-6 rounded mr-2"
-                  src="https://cdn-icons-png.flaticon.com/512/919/919832.png"
-                  alt="technology logo"
-                />
-                <span className="leading-3 text-sm">{article.tag || 'Typesctipt'}</span>
-              </div>
-            </div>
+            <ArticleTags tags={article.tags} />
             <div className="flex items-center justify-end relative left-1.5">
-              <Lightbulb size={24} className="text-yellow-400" />
-              <Lightbulb size={24} className="text-yellow-400" />
-              <Lightbulb size={24} className="text-slate-300 dark:text-slate-600" />
+              {[...Array(3)].map((_, index) => (
+                <Lightbulb
+                  key={index}
+                  size={24}
+                  className={
+                    index < activeBulbs ? 'text-yellow-400' : 'text-slate-300 dark:text-slate-600'
+                  }
+                />
+              ))}
             </div>
           </div>
           <div className="flex items-center justify-start">
             <img
               className="w-12 h-12 rounded-full ring-4 ring-gray-200 dark:ring-[var(--color-border)]"
-              src={article.authorImage || 'https://randomuser.me/api/portraits/men/32.jpg'}
-              alt={article.author || 'Tomas Trajan'}
+              src={article.author.avatar}
+              alt={article.author.name}
               loading="lazy"
             />
             <div>
               <p className="ml-3 text-sm font-extrabold leading-5 text-[var(--color-primary)] dark:text-[var(--color-primary)]">
-                {article.author || 'Tomas Trajan'}
+                {article.author.name}
               </p>
-              <p className="ml-3 text-sm text-slate-500 dark:text-[var(--color-muted-foreground)] hover:text-blue-700 dark:hover:text-blue-400">
-                {article.authorHandle || '@tomastrajan'}
+              <p className="ml-3 text-sm text-slate-500 dark:text-[var(--color-muted-foreground)]">
+                {formatDate(article.date)}
               </p>
             </div>
           </div>
           <div className="flex flex-col items-end justify-center">
             <p className="text-sm text-slate-500 dark:text-[var(--color-muted-foreground)]">
-              {article.date}
-            </p>
-            <p className="text-sm text-slate-500 dark:text-[var(--color-muted-foreground)]">
-              {article.readTime || '13 min read'}
+              {article.readingTime}
             </p>
           </div>
         </div>

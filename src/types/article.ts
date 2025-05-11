@@ -1,12 +1,20 @@
-export interface Article {
+export interface ArticleMetadata {
   slug: string;
   title: string;
   description: string;
-  previewImage: string;
   date: string;
-  author?: string;
-  authorImage?: string;
-  authorHandle?: string;
-  readTime?: string;
-  tag?: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  tags: string[];
+  difficulty: string;
+  coverImage: string;
+  readingTime: string;
+  canonicalUrl: string;
+}
+
+export interface ArticleWithContent {
+  metadata: ArticleMetadata;
+  content: string;
 }

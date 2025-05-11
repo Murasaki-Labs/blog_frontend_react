@@ -1,9 +1,9 @@
 import React from 'react';
-import { Article } from '../types/article';
+import { ArticleMetadata } from '../types/article';
 import { ArticlePreview } from './ArticlePreview';
 
 interface ArticlePreviewGridProps {
-  articles: Article[];
+  articles: ArticleMetadata[];
   loading?: boolean;
 }
 
@@ -14,8 +14,8 @@ export const ArticlePreviewGrid: React.FC<ArticlePreviewGridProps> = ({
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {(loading ? Array.from({ length: 6 }) : articles).map((article, idx) => (
       <ArticlePreview
-        key={loading ? idx : (article as Article).slug}
-        article={article as Article}
+        key={loading ? idx : (article as ArticleMetadata).slug}
+        article={article as ArticleMetadata}
         loading={loading}
       />
     ))}
