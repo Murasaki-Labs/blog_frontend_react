@@ -1,19 +1,37 @@
 import { useEffect, useState } from 'react';
-import { getParsedArticle, ParsedArticle } from '../facades/articleFacade';
+import { fetchArticleBySlug } from '../services/article.service';
+import { ArticleWithContent } from '../types/article';
 
 export function useArticle(slug?: string) {
-  const [article, setArticle] = useState<ParsedArticle | null>(null);
+  const [article, setArticle] = useState<ArticleWithContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
-    setError(null);
-    getParsedArticle(slug)
-      .then(setArticle)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+
+    const abortController = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchArticleBySlug(slug);
+        setArticle(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load article');
+      } finally {
+        if (!abortController.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      abortController.abort();
+    };
   }, [slug]);
 
   return { article, loading, error };
